@@ -500,7 +500,7 @@ npm run build
 ---
 
 <p align="center">
-  For full technical details, see <a href="TECHNICAL_REPORT.md">Technical Report</a> · For API and component documentation, see <a href="DOCUMENTATION.md">Documentation</a>
+  For full technical details, see <a href="TECHNICAL_REPORT.md">Technical Report</a>
 </p>
 
 <p align="center"><strong>Only what you need.</strong></p>
