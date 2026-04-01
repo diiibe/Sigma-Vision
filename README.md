@@ -38,21 +38,6 @@ Parking facilities generate thousands of hours of surveillance footage monthly. 
 
 This is not a notebook. It is a working full-stack application that processes video in real time during the live demo.
 
-```mermaid
-graph LR
-    A["Raw MP4<br/>(per camera)"] --> B["Frame Extraction<br/>5 FPS"]
-    B --> C["YOLO Detection<br/>(vehicles / persons)"]
-    C --> D["Hungarian Tracker<br/>(centroid + IoU)"]
-    D --> E["Spatial Logic"]
-    E --> F["Bay Occupancy<br/>(RCNN + Hysteresis)"]
-    E --> G["Line Crossing<br/>(centroid trails)"]
-    E --> H["Density Zones<br/>(polygon containment)"]
-    E --> I["Behavioral Events<br/>(FSM + proximity)"]
-    F & G & H & I --> J["Metric Aggregation<br/>+ Evidence Generation"]
-    J --> K["SQLite + REST/SSE API"]
-    K --> L["React Dashboard<br/>+ 3D Digital Twin"]
-```
-
 ![Dashboard Overview](docs/screenshots/dashboard-overview.png)
 
 ---
@@ -60,18 +45,6 @@ graph LR
 ## Demo
 
 Everything runs live on one machine. No pre-recorded results, no pre-computed metrics.
-
-| Live Occupancy Dashboard | Vehicle Analysis & Counting |
-|:---:|:---:|
-| ![3D Digital Twin with real-time occupancy](docs/screenshots/live-dashboard.png) | ![YOLO bounding boxes and counting lines](docs/screenshots/vehicle-analysis.png) |
-| 3D digital twin updating live, bay-level occupancy, camera feeds with SVG overlays, zone KPIs, event archive | Draw counting lines on camera image, live YOLO bounding boxes, entry/exit counters, hourly timeline |
-
-| Security Event Detection | Spatial Configuration Editor |
-|:---:|:---:|
-| ![Behavioral events with evidence clips](docs/screenshots/security-events.png) | ![Interactive polygon editor](docs/screenshots/config-editor.png) |
-| Person detection with behavioral FSM, event badges (running, chasing, altercation), 5-second evidence clip download | Draw bays, zones, lines directly on camera image, multi-level support, version history |
-
-### Demo Flow
 
 1. **`/live`** — 3D twin updating live. Click any bay for detail card (status, confidence, dwell time). Switch cameras. Filter by zone or level.
 2. **`/analysis`** — Draw a counting line on the camera feed. Toggle it on. Watch vehicles cross — counter increments in real time.
@@ -167,20 +140,20 @@ npm run dev:demo
 
 ```mermaid
 graph TD
-    A["Raw MP4 per camera"] --> B["Frame extraction at 5 FPS<br/>(ffmpeg, JPEG cache)"]
-    B --> C{"Detection Model"}
-    C -->|Vehicles| D["YOLOv8s-VisDrone<br/>mAP@0.5 = 0.408"]
-    C -->|Persons| E["YOLO11s-COCO<br/>person class only"]
-    D --> F["Hungarian Tracker<br/>(centroid + IoU cost)"]
-    E --> G["Security Tracker"]
-    F --> H["RCNN Bay Occupancy<br/>+ Hysteresis FSM"]
-    F --> I["Line Crossing Engine<br/>(8-frame centroid trail)"]
-    F --> J["Density Engine<br/>(ray-casting + smoothing)"]
-    G --> K["Behavioral FSM Engine<br/>(6 event types)"]
-    H & I & J & K --> L["Metric Aggregation<br/>(zone rollups, hourly/daily)"]
-    L --> M["Evidence Generation<br/>(5s clips via ffmpeg)"]
-    M --> N["SQLite WAL + REST/SSE"]
-    N --> O["React Dashboard + 3D Twin"]
+    A["Raw Video<br/>(per camera)"] --> B["Frame Extraction"]
+    B --> C{"Detection"}
+    C -->|Vehicles| D["YOLOv8s-VisDrone"]
+    C -->|Persons| E["YOLO11s"]
+    D --> F["Object Tracking"]
+    E --> G["Person Tracking"]
+    F --> H["Bay Occupancy<br/>(RCNN + Hysteresis)"]
+    F --> I["Line Crossing<br/>Detection"]
+    F --> J["Density<br/>Monitoring"]
+    G --> K["Behavioral<br/>Event Detection"]
+    H & I & J & K --> L["Metric Aggregation"]
+    L --> M["Evidence Generation"]
+    M --> N["REST / SSE API"]
+    N --> O["React Dashboard<br/>+ 3D Digital Twin"]
 ```
 
 ### Three Functional Modules
@@ -191,7 +164,8 @@ All modules share spatial configuration and camera infrastructure but run **inde
 
 #### Module 1 — Live Occupancy Dashboard (`/live`)
 
-The default view. A three-panel tactical layout designed for continuous monitoring.
+![Live Occupancy Dashboard](docs/screenshots/live-dashboard.png)
+
 
 **What it shows:**
 - **Left — Analytics:** Occupancy rate, slot breakdown (occupied/free/EV/reserved/unknown) with toggle filters, zone and level selectors, CSV export.
@@ -203,6 +177,8 @@ The default view. A three-panel tactical layout designed for continuous monitori
 ---
 
 #### Module 2 — Vehicle Analysis & Counting (`/analysis`, `/counting`)
+
+![Vehicle Analysis & Counting](docs/screenshots/vehicle-analysis.png)
 
 The operator creates observation tasks — pairing a camera with a specific measurement (counting line or density zone) drawn directly on the camera image.
 
@@ -221,6 +197,8 @@ The operator creates observation tasks — pairing a camera with a specific meas
 
 #### Module 3 — Security Event Detection (`/events`)
 
+![Security Event Detection](docs/screenshots/security-events.png)
+
 The operator creates security tasks — pairing a camera with one or more monitoring zones and selecting which behaviors to detect.
 
 **Workflow — step by step:**
@@ -237,6 +215,8 @@ The operator creates security tasks — pairing a camera with one or more monito
 ---
 
 #### Spatial Configuration Editor (`/config`) and the 3D Digital Twin
+
+![Spatial Configuration Editor](docs/screenshots/config-editor.png)
 
 The editor is the foundation that shapes the entire system. Every bay polygon, counting line, and zone drawn in the editor drives both the backend analysis and the 3D visualization.
 
