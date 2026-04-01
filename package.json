@@ -1,0 +1,40 @@
+{
+  "name": "tactical-parking-control-dashboard",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run dev:demo",
+    "dev:ui": "vite",
+    "dev:api": "HACK26_STATE_DIR=\"${HACK26_STATE_DIR:-backend/state/dev-blank}\" python3 -m uvicorn backend.app:app --reload --port 8000",
+    "dev:demo": "node scripts/dev-demo.mjs",
+    "bootstrap:demo": "python3 backend/scripts/bootstrap_demo_assets.py",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:backend": "python3 -m unittest discover -s backend/tests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@react-spring/three": "^10.0.2",
+    "@react-three/drei": "^10.7.4",
+    "@react-three/fiber": "^9.0.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.3",
+    "three": "^0.179.1",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.4",
+    "vitest": "^3.2.4"
+  }
+}

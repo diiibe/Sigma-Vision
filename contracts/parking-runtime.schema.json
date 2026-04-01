@@ -1,0 +1,730 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hack26.local/contracts/parking-runtime.schema.json",
+  "title": "Hack26 Parking Runtime Shared Contracts",
+  "description": "Canonical contracts shared by the live operations backend, replay harness, observability helpers, and frontend API types.",
+  "x-contracts": [
+    "SpatialConfig",
+    "DetectionRecord",
+    "TrackRecord",
+    "BayState",
+    "ZoneKpiState",
+    "FlowEvent",
+    "AlertEvent",
+    "TimelinePoint",
+    "ModuleHealth",
+    "LiveStateSnapshot"
+  ],
+  "$defs": {
+    "PolygonPoint": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    },
+    "Polygon": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "$ref": "#/$defs/PolygonPoint"
+      }
+    },
+    "BoundingBox": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ]
+    },
+    "SpatialBay": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bayId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "cameraId": {
+          "type": "string"
+        },
+        "zoneId": {
+          "type": "string"
+        },
+        "polygon": {
+          "$ref": "#/$defs/Polygon"
+        },
+        "sensorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "bayId",
+        "label",
+        "zoneId",
+        "polygon"
+      ]
+    },
+    "SpatialZone": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "zoneId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "parking",
+            "lane",
+            "holding",
+            "cluster"
+          ]
+        },
+        "polygon": {
+          "$ref": "#/$defs/Polygon"
+        },
+        "bayIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "zoneId",
+        "label",
+        "kind",
+        "polygon",
+        "bayIds"
+      ]
+    },
+    "SpatialLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lineId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "entry",
+            "exit"
+          ]
+        },
+        "points": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/PolygonPoint"
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "lineId",
+        "label",
+        "direction",
+        "points"
+      ]
+    },
+    "BayZoneMembership": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bayId": {
+          "type": "string"
+        },
+        "zoneId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bayId",
+        "zoneId"
+      ]
+    },
+    "SpatialConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "configId": {
+          "type": "string"
+        },
+        "cameraId": {
+          "type": "string"
+        },
+        "cameraLabel": {
+          "type": "string"
+        },
+        "frameWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frameHeight": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "active",
+            "archived"
+          ]
+        },
+        "countingEnabled": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "isActive": {
+              "type": "boolean"
+            },
+            "activatedAt": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "activatedBy": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "activationNote": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "isActive"
+          ]
+        },
+        "bays": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SpatialBay"
+          }
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SpatialZone"
+          }
+        },
+        "entryLines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SpatialLine"
+          }
+        },
+        "exitLines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SpatialLine"
+          }
+        },
+        "bayZoneMemberships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BayZoneMembership"
+          }
+        }
+      },
+      "required": [
+        "configId",
+        "cameraId",
+        "frameWidth",
+        "frameHeight",
+        "version",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "bays",
+        "zones",
+        "entryLines",
+        "exitLines",
+        "bayZoneMemberships"
+      ]
+    },
+    "DetectionRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frameId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "bbox": {
+          "$ref": "#/$defs/BoundingBox"
+        },
+        "class": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sourceModel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "frameId",
+        "timestamp",
+        "bbox",
+        "class",
+        "confidence"
+      ]
+    },
+    "TrackRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frameId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trackId": {
+          "type": "string"
+        },
+        "bbox": {
+          "$ref": "#/$defs/BoundingBox"
+        },
+        "class": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "age": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "persistenceSeconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "frameId",
+        "timestamp",
+        "trackId",
+        "bbox",
+        "class",
+        "confidence",
+        "age",
+        "hits",
+        "persistenceSeconds"
+      ]
+    },
+    "BayState": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bayId": {
+          "type": "string"
+        },
+        "zoneId": {
+          "type": "string"
+        },
+        "occupied": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lastChangedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceTrackIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sourceFrameId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "bayId",
+        "zoneId",
+        "occupied",
+        "confidence",
+        "lastChangedAt",
+        "sourceTrackIds"
+      ]
+    },
+    "ZoneKpiState": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "zoneId": {
+          "type": "string"
+        },
+        "totalBays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "occupiedBays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "availableBays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "occupancyPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "zoneId",
+        "totalBays",
+        "occupiedBays",
+        "availableBays",
+        "occupancyPercentage",
+        "lastUpdatedAt"
+      ]
+    },
+    "FlowEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "eventId": {
+          "type": "string"
+        },
+        "lineId": {
+          "type": "string"
+        },
+        "eventType": {
+          "type": "string",
+          "enum": [
+            "entry",
+            "exit"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "entry",
+            "exit"
+          ]
+        },
+        "trackId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "eventId",
+        "lineId",
+        "eventType",
+        "direction",
+        "trackId",
+        "timestamp",
+        "confidence",
+        "valid"
+      ]
+    },
+    "AlertEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "alertId": {
+          "type": "string"
+        },
+        "sourceKpi": {
+          "type": "string"
+        },
+        "thresholdRule": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "critical"
+          ]
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "firstSeen": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastEvaluated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "explanationText": {
+          "type": "string"
+        },
+        "currentValue": {
+          "type": "number"
+        },
+        "thresholdValue": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "alertId",
+        "sourceKpi",
+        "thresholdRule",
+        "severity",
+        "active",
+        "firstSeen",
+        "lastEvaluated",
+        "explanationText"
+      ]
+    },
+    "TimelinePoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bucketStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metricName": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "windowSeconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "bucketStart",
+        "metricName",
+        "scope",
+        "value",
+        "windowSeconds"
+      ]
+    },
+    "ModuleHealth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "moduleName": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "healthy",
+            "degraded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "latencyMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "moduleName",
+        "status",
+        "updatedAt"
+      ]
+    },
+    "LiveStateSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshotId": {
+          "type": "string"
+        },
+        "cameraId": {
+          "type": "string"
+        },
+        "capturedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "spatialConfigVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bayStates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BayState"
+          }
+        },
+        "zoneKpis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ZoneKpiState"
+          }
+        },
+        "flowEvents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FlowEvent"
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AlertEvent"
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TimelinePoint"
+          }
+        },
+        "moduleHealth": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ModuleHealth"
+          }
+        },
+        "counters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "snapshotId",
+        "cameraId",
+        "capturedAt",
+        "spatialConfigVersion",
+        "bayStates",
+        "zoneKpis",
+        "flowEvents",
+        "alerts",
+        "timeline",
+        "moduleHealth"
+      ]
+    }
+  }
+}

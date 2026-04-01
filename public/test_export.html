@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><body style="background:#111;color:#eee;font-family:monospace">
+<h2>Export Test</h2>
+<button onclick="testExport('/api/export/security')">Security CSV</button>
+<button onclick="testExport('/api/export/counting')">Counting CSV</button>
+<button onclick="testExport('/api/export/density')">Density CSV</button>
+<hr>
+<button onclick="downloadTest('/api/export/security','security.csv')">Download Security</button>
+<pre id="out">Click a button to test fetch, or Download to test blob download...</pre>
+<script>
+async function testExport(url) {
+  const out = document.getElementById('out');
+  out.textContent = 'Fetching ' + url + '...\n';
+  try {
+    const res = await fetch(url);
+    out.textContent += 'Status: ' + res.status + '\n';
+    out.textContent += 'Content-Type: ' + res.headers.get('content-type') + '\n';
+    out.textContent += 'Content-Disposition: ' + res.headers.get('content-disposition') + '\n';
+    const text = await res.text();
+    out.textContent += 'Body length: ' + text.length + ' chars\n';
+    out.textContent += 'Lines: ' + text.split('\n').length + '\n';
+    out.textContent += '\nFirst 500 chars:\n' + text.substring(0, 500) + '\n';
+  } catch(e) {
+    out.textContent += 'ERROR: ' + e + '\n';
+  }
+}
+
+async function downloadTest(url, filename) {
+  const out = document.getElementById('out');
+  out.textContent = 'Downloading ' + url + '...\n';
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    out.textContent += 'Got ' + text.length + ' chars, ' + text.split('\n').length + ' lines\n';
+    const blob = new Blob([text], {type: 'text/csv;charset=utf-8'});
+    out.textContent += 'Blob size: ' + blob.size + '\n';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    out.textContent += 'Click triggered. File should download.\n';
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 10000);
+  } catch(e) {
+    out.textContent += 'ERROR: ' + e + '\n';
+  }
+}
+</script>
+</body></html>

@@ -1,0 +1,14 @@
+node_modules
+datasets
+.git
+__pycache__
+*.pyc
+.DS_Store
+.claude
+docs
+tests
+backend/model/visdrone_training
+dist
+.env
+*.sqlite-shm
+*.sqlite-wal

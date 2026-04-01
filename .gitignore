@@ -1,0 +1,36 @@
+node_modules/
+dist/
+build/
+.env
+
+# Runtime state (generated at startup)
+backend/state/
+backend/runtime/*.db
+backend/runtime/*.sqlite
+backend/demo.sqlite
+
+# Model weights (downloaded at runtime)
+*.pt
+*.onnx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+backend/.venv/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Generated TypeScript build output
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+vitest.setup.js
+vitest.setup.d.ts
+
+# Misc
+.DS_Store
+.pytest_cache/
+output/
+tmp/

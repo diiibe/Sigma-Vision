@@ -1,0 +1,158 @@
+{
+  "uid": "hack26-parking-ops",
+  "title": "Hack26 Parking Ops",
+  "tags": [
+    "hack26",
+    "parking",
+    "ops"
+  ],
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Input FPS",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "hack26_input_fps",
+          "legendFormat": "fps",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Pipeline Latency",
+      "gridPos": {
+        "h": 8,
+        "w": 18,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      },
+      "targets": [
+        {
+          "expr": "hack26_detector_latency_ms",
+          "legendFormat": "detector",
+          "refId": "A"
+        },
+        {
+          "expr": "hack26_tracker_latency_ms",
+          "legendFormat": "tracker",
+          "refId": "B"
+        },
+        {
+          "expr": "hack26_end_to_end_state_latency_ms",
+          "legendFormat": "state",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Reliability Counters",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "increase(hack26_dropped_frames_total[5m])",
+          "legendFormat": "dropped frames",
+          "refId": "A"
+        },
+        {
+          "expr": "increase(hack26_processing_errors_total[5m])",
+          "legendFormat": "processing errors",
+          "refId": "B"
+        },
+        {
+          "expr": "increase(hack26_stale_data_incidents_total[5m])",
+          "legendFormat": "stale data",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "State Health",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "hack26_active_tracks",
+          "legendFormat": "active tracks",
+          "refId": "A"
+        },
+        {
+          "expr": "hack26_active_alerts",
+          "legendFormat": "active alerts",
+          "refId": "B"
+        },
+        {
+          "expr": "increase(hack26_state_inconsistencies_total[15m])",
+          "legendFormat": "state inconsistencies",
+          "refId": "C"
+        }
+      ]
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m"
+    ]
+  }
+}

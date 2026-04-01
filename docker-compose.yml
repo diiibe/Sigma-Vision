@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - HACK26_STATE_DIR=backend/state/app-data
+      - HACK26_DEMO_ASSETS_DIR=/app/demo-assets
+      - HACK26_CORS_ORIGINS=*
+      - HACK26_BOOTSTRAP_LAYOUT=blank
+      - DEMO_MODE=0
+
+  demo:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - HACK26_STATE_DIR=backend/state/dev-blank
+      - HACK26_DEMO_ASSETS_DIR=/app/demo-assets
+      - HACK26_CORS_ORIGINS=*
+      - HACK26_BOOTSTRAP_LAYOUT=blank
+      - DEMO_MODE=1
