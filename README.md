@@ -499,6 +499,12 @@ npm run build
 
 ---
 
+## Development Tools
+
+Parts of this project were developed with the assistance of AI coding tools — specifically [Claude Code](https://claude.ai/claude-code) and [OpenAI Codex](https://openai.com/index/openai-codex/). These tools were used as pair-programming aids for scaffolding, refactoring, and documentation drafting. All architectural decisions, model selection, pipeline design, and domain-specific logic were made by the team.
+
+---
+
 <p align="center">
   For full technical details, see <a href="TECHNICAL_REPORT.md">Technical Report</a>
 </p>
