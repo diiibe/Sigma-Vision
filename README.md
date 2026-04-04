@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/%F0%9F%8F%86%201st%20Place-Beantech%20Spring%20Hackathon%202026-gold?style=for-the-badge" alt="1st Place — Beantech Spring Hackathon 2026" />
+</p>
+
+<p align="center">
   Beantech Spring Hackathon 2026 · Challenge 2: From Video to Value
 </p>
 
